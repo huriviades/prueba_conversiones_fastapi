@@ -1,0 +1,35 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Entrar en el contenedor y ejecutar comandos') {
+            steps {
+                script {
+                    // Ejecutar comandos dentro del contenedor Docker
+                    sh '''
+                    # Iniciar el contenedor y ejecutar bash
+                    docker-compose -f /opt/dockers/apis/docker-compose.yml exec demo_api_app bash -c "
+                    cd /var/www/html/ &&
+                    git checkout postgresql-dev &&
+                    git pull origin postgresql-dev &&
+                    supervisorctl restart demo_api &&
+                    supervisorctl status demo_api
+                    "
+                    '''
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            echo 'Pipeline completado.'
+        }
+        success {
+            echo 'Pipeline exitoso.'
+        }
+        failure {
+            echo 'El pipeline ha fallado.'
+        }
+    }
+}
