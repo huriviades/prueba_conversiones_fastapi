@@ -2,19 +2,81 @@ pipeline {
     agent any
 
     stages {
-        stage('Entrar en el contenedor y ejecutar comandos') {
+        stage('Actualizar el sistema') {
             steps {
                 script {
-                    // Ejecutar comandos dentro del contenedor Docker
+                    // Actualizar el sistema
                     sh '''
-                    # Iniciar el contenedor y ejecutar bash
-                    docker-compose -f /opt/dockers/apis/docker-compose.yml exec demo_api_app bash -c "
-                    cd /var/www/html/ &&
-                    git checkout postgresql-dev &&
-                    git pull origin postgresql-dev &&
-                    supervisorctl restart demo_api &&
-                    supervisorctl status demo_api
-                    "
+                    apt update && apt upgrade -y
+                    '''
+                }
+            }
+        }
+
+        stage('Instalar dependencias') {
+            steps {
+                script {
+                    // Instalar herramientas y dependencias
+                    sh '''
+                    apt install nano git curl -y
+                    apt install build-essential libssl-dev libffi-dev python3-pip python3-dev python3-venv -y
+                    apt install python3-pip python3-cffi python3-brotli -y
+                    apt install libpango-1.0-0 libharfbuzz0b libpangoft2-1.0-0 -y
+                    '''
+                }
+            }
+        }
+
+        stage('Configurar entorno virtual y instalar paquetes de Python') {
+            steps {
+                script {
+                    // Crear el entorno virtual y activar
+                    sh '''
+                    mkdir -p /opt/demo_api/workspace/envs
+                    python3 -m venv /opt/demo_api/workspace/envs/demo_api
+                    . /opt/demo_api/workspace/envs/demo_api/bin/activate
+
+                    # Instalar dependencias de Python
+                    pip install --upgrade pip
+                    pip install fastapi uvicorn psycopg2-binary gunicorn sqlalchemy
+                    '''
+                }
+            }
+        }
+
+        stage('Clonar repositorio') {
+            steps {
+                script {
+                    // Clonar el repositorio y cambiar a la rama deseada
+                    sh '''
+                    mkdir -p /opt/demo_api/testing
+                    cd /opt/demo_api/testing
+                    git clone https://github.com/huriviades/prueba_conversiones_fastapi.git .
+                    git checkout postgresql-dev
+                    '''
+                }
+            }
+        }
+
+        stage('Ejecutar la aplicación') {
+            steps {
+                script {
+                    // Ejecutar la aplicación con Gunicorn dentro del entorno virtual
+                    sh '''
+                    . /opt/demo_api/workspace/envs/demo_api/bin/activate
+                    cd /opt/demo_api/testing/demo_api
+                    gunicorn --bind 0.0.0.0:80 -w 2 -k uvicorn.workers.UvicornWorker main:app > gunicorn.log 2>&1 &
+                    '''
+                }
+            }
+        }
+
+        stage('Verificar la aplicación') {
+            steps {
+                script {
+                    // Verificar si la aplicación está corriendo
+                    sh '''
+                    curl -Is http://localhost/docs | head -n 1
                     '''
                 }
             }
