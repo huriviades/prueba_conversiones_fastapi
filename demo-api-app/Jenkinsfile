@@ -13,6 +13,17 @@ pipeline {
             }
         }
 
+        stage('Corregir dpkg') {
+            steps {
+                script {
+                    // Corregir dpkg
+                    sh '''
+                    dpkg --configure -a
+                    '''
+                }
+            }
+        }
+
         stage('Instalar dependencias') {
             steps {
                 script {
