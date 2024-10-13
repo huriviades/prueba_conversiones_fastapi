@@ -31,8 +31,7 @@ pipeline {
                     if (folderExists == 'exists') {
                         echo "El folder /opt/demo_api/ existe. Terminando pipeline."
                         currentBuild.result = 'SUCCESS'
-                        echo 'Saltando el resto de los stages porque el folder ya existe.'
-                        return // Terminamos el pipeline exitosamente
+                        error('Saltando el resto de los stages porque el folder ya existe.')
                     } else {
                         echo "El folder /opt/demo_api/ no existe. Continuando con el pipeline."
                     }
