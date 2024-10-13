@@ -44,6 +44,7 @@ pipeline {
                     . /opt/demo_api/workspace/envs/demo_api/bin/activate
                     pip install --upgrade pip
                     pip install fastapi uvicorn psycopg2-binary gunicorn sqlalchemy
+                    deactivate
                     '''
                 }
             }
