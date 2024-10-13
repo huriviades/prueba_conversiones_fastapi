@@ -24,26 +24,6 @@ pipeline {
             }
         }
 
-        stage('Verificar carpeta y archivos') {
-            steps {
-                script {
-                    try {
-                        // Verificar si la carpeta /opt/demo_api/ existe y tiene archivos
-                        if (fileExists('/opt/demo_api/') && sh(script: 'ls /opt/demo_api/ | wc -l', returnStdout: true).trim().toInteger() > 0) {
-                            echo 'La carpeta /opt/demo_api/ existe y tiene archivos. Las dependencias ya están instaladas.'
-                            currentBuild.result = 'SUCCESS'  // Establecer el resultado del pipeline a exitoso
-                            return // Salir del script para evitar la ejecución de otros stages
-                        } else {
-                            echo 'La carpeta /opt/demo_api/ no existe o está vacía. Continuando con el pipeline...'
-                        }
-                    } catch (Exception error) {
-                        currentBuild.result = 'SUCCESS'
-                        return
-                    }
-                }
-            }
-        }
-
         stage('Instalar dependencias') {
             steps {
                 script {
@@ -76,16 +56,25 @@ pipeline {
             }
         }
 
-        stage('Clonar repositorio') {
+        stage('Clonar/Actualizar repositorio') {
             steps {
                 script {
-                    // Clonar el repositorio y cambiar a la rama deseada
-                    sh '''
-                    mkdir -p /opt/demo_api/testing
-                    cd /opt/demo_api/testing
-                    git clone https://github.com/huriviades/prueba_conversiones_fastapi.git .
-                    git checkout postgresql-dev
-                    '''
+                    // Verificar si existe el directorio
+                    def dir = '/opt/demo_api/testing'
+                    if (fileExists(dir)) {
+                        // Si existe, cambiar al directorio y hacer pull
+                        dir(dir) {
+                            sh 'git pull origin postgresql-dev'
+                        }
+                    } else {
+                        // Si no existe, crear el directorio, clonar el repositorio y hacer checkout
+                        sh """
+                            mkdir -p ${dir}
+                            cd ${dir}
+                            git clone https://github.com/huriviades/prueba_conversiones_fastapi.git .
+                            git checkout postgresql-dev
+                        """
+                    }
                 }
             }
         }
