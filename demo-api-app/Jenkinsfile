@@ -24,6 +24,26 @@ pipeline {
             }
         }
 
+        stage('Verificar carpeta y archivos') {
+            steps {
+                script {
+                    try {
+                        // Verificar si la carpeta /opt/demo_api/ existe y tiene archivos
+                        if (fileExists('/opt/demo_api/') && sh(script: 'ls /opt/demo_api/ | wc -l', returnStdout: true).trim().toInteger() > 0) {
+                            echo 'La carpeta /opt/demo_api/ existe y tiene archivos. Las dependencias ya están instaladas.'
+                            currentBuild.result = 'SUCCESS'  // Establecer el resultado del pipeline a exitoso
+                            return // Salir del script para evitar la ejecución de otros stages
+                        } else {
+                            echo 'La carpeta /opt/demo_api/ no existe o está vacía. Continuando con el pipeline...'
+                        }
+                    } catch (Exception error) {
+                        currentBuild.result = 'SUCCESS'
+                        return
+                    }
+                }
+            }
+        }
+
         stage('Instalar dependencias') {
             steps {
                 script {
