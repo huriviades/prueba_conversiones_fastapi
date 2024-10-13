@@ -66,6 +66,7 @@ pipeline {
                         sh """
                             cd ${dir}
                             git pull origin postgresql-dev
+                            git checkout postgresql-dev
                         """
                     } else {
                         // Si no existe, crear el directorio, clonar el repositorio y hacer checkout
