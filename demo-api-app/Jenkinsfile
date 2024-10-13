@@ -50,7 +50,7 @@ pipeline {
             }
         }
 
-        stage('Clonar/Actualizar repositorio') {
+        stage('Clonar repositorio') {
             steps {
                 script {
                     sh '''
@@ -58,7 +58,6 @@ pipeline {
                     cd /opt/demo_api/testing
                     git clone https://github.com/huriviades/prueba_conversiones_fastapi.git .
                     git checkout postgresql-dev
-                    git pull postgresql-dev
                     '''
                 }
             }
