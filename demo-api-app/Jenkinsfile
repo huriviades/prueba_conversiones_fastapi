@@ -50,6 +50,7 @@ pipeline {
                     # Instalar dependencias de Python
                     pip install --upgrade pip
                     pip install fastapi uvicorn psycopg2-binary gunicorn sqlalchemy
+                    deactivate
                     '''
                 }
             }
@@ -77,6 +78,7 @@ pipeline {
                     . /opt/demo_api/workspace/envs/demo_api/bin/activate
                     cd /opt/demo_api/testing/demo_api
                     gunicorn --bind 0.0.0.0:80 -w 2 -k uvicorn.workers.UvicornWorker main:app > gunicorn.log 2>&1 &
+                    sleep 5  # Espera de 5 segundos
                     '''
                 }
             }
