@@ -22,6 +22,24 @@ pipeline {
             }
         }
 
+        stage('Verificar si el folder existe') {
+            steps {
+                script {
+                    def folderExists = sh(script: '[ -d /opt/demo_api/ ] && echo "exists" || echo "not exists"', returnStdout: true).trim()
+                    echo "Folder /opt/demo_api/: ${folderExists}"
+
+                    if (folderExists == 'exists') {
+                        echo "El folder /opt/demo_api/ existe. Terminando pipeline."
+                        currentBuild.result = 'SUCCESS'
+                        echo 'Saltando el resto de los stages porque el folder ya existe.'
+                        return // Terminamos el pipeline exitosamente
+                    } else {
+                        echo "El folder /opt/demo_api/ no existe. Continuando con el pipeline."
+                    }
+                }
+            }
+        }
+
         stage('Instalar dependencias') {
             steps {
                 script {
