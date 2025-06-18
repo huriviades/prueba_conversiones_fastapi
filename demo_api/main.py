@@ -3,6 +3,7 @@ from routes.routes import temperatura_router
 
 app = FastAPI()
 
+#Prueba de CD - Comentario
 # Incluir el router de temperatura_router con la etiqueta 'Conversiones de Temperaturas'
 app.include_router(temperatura_router, tags=["Conversiones de Temperaturas"])
 
