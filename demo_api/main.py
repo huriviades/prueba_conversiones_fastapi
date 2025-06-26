@@ -5,7 +5,7 @@ app = FastAPI()
 
 #Prueba de CD - Comentario
 # Incluir el router de temperatura_router con la etiqueta 'Conversiones de Temperaturas'
-app.include_router(temperatura_router, tags=["Conversiones de Temperaturas"])
+app.include_router(temperatura_router, tags=["Conversiones de Temperaturas 🌡️"])
 
 if __name__ == "__main__":
     import uvicorn
