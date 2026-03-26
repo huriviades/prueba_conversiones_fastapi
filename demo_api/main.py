@@ -6,6 +6,7 @@ app = FastAPI()
 #Prueba de CD - Comentario
 # Incluir el router de temperatura_router con la etiqueta 'Conversiones de Temperaturas'
 # Obligar a un commit para demostrar el CI/CD con Jerkins
+# Comentario del Jenkins - 25-03-2026
 app.include_router(temperatura_router, tags=["Conversiones de Temperaturas 🌡️"])
 
 if __name__ == "__main__":
