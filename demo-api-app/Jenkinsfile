@@ -49,7 +49,7 @@ pipeline {
 
                     # Instalar dependencias de Python
                     pip install --upgrade pip
-                    pip install fastapi uvicorn psycopg2-binary gunicorn sqlalchemy
+                    pip install fastapi uvicorn psycopg[binary] gunicorn sqlalchemy
                     deactivate
                     '''
                 }
